@@ -2,7 +2,7 @@
 __pycache__/
 venv/
 .env
-map t
-silkroadmap
+pom
+map
 *.rar
 log.log
