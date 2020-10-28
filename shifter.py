@@ -36,7 +36,7 @@ def config():
 
 def shift():
     global zoom_shift, column_shift, row_shift
-
+    errors = 0
     for zoom in range(0, MAX_ZOOM + 1):
         for column in range(0, 2 ** zoom):
             for row in range(0, 2 ** zoom):
@@ -45,15 +45,18 @@ def shift():
                                         str(row + (2 ** zoom) * row_shift) + '.png')
                 if not os.path.exists(src_path):
                     logging.error('source file not found ' + src_path)
+                    errors += 1
                 else:
                     if not os.path.exists(dst_path):
                         logging.error('destination file not found ' + dst_path)
+                        errors += 1
                     else:
                         try:
                             # print('dish ', end='')
                             shutil.move(src_path, dst_path)
                         except:
                             logging.error('moving encountered error' + src_path + ' to ' + dst_path)
+                            errors += 1
 
         print(10 * '*')
 
