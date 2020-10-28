@@ -1,0 +1,8 @@
+.idea/
+__pycache__/
+venv/
+.env
+map t
+silkroadmap
+*.rar
+log.log
