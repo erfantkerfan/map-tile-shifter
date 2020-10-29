@@ -13,7 +13,7 @@ from pick import pick
 
 logging.basicConfig(level=logging.WARNING, filename='log.log', filemode='w', format='%(levelname)s - %(message)s')
 
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 
 
 # get initialising values from user via console
@@ -38,6 +38,7 @@ def shift():
     global zoom_shift, column_shift, row_shift
     errors = 0
     for zoom in range(0, MAX_ZOOM + 1):
+        bar = tqdm(total=2 ** zoom, desc='zoom ' + str(zoom), unit='pic')
         for column in range(0, 2 ** zoom):
             for row in range(0, 2 ** zoom):
                 src_path = os.path.join(SRC_DIR, str(zoom), str(column), str(row)) + '.png'
@@ -52,13 +53,12 @@ def shift():
                         errors += 1
                     else:
                         try:
-                            # print('dish ', end='')
                             shutil.move(src_path, dst_path)
                         except:
                             logging.error('moving encountered error' + src_path + ' to ' + dst_path)
                             errors += 1
-
-        print(10 * '*')
+            bar.update(1)
+        bar.close()
 
 
 # update the code with github
@@ -122,6 +122,17 @@ def reload(updated=False):
 
 if __name__ == '__main__':
     # set up initial variables
+    shahb_asci = '''
+ __    __  __         ______   __                  __                  __       
+|  \  |  \|  \       /      \ |  \                |  \                |  \      
+| $$  | $$ \$$      |  $$$$$$\| $$____    ______  | $$____    ______  | $$____  
+| $$__| $$|  \      | $$___\$$| $$    \  |      \ | $$    \  |      \ | $$    \ 
+| $$    $$| $$       \$$    \ | $$$$$$$\  \$$$$$$\| $$$$$$$\  \$$$$$$\| $$$$$$$\\
+| $$$$$$$$| $$       _\$$$$$$\| $$  | $$ /      $$| $$  | $$ /      $$| $$  | $$
+| $$  | $$| $$      |  \__| $$| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$__/ $$
+| $$  | $$| $$       \$$    $$| $$  | $$ \$$    $$| $$  | $$ \$$    $$| $$    $$
+ \$$   \$$ \$$        \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$  \$$$$$$$ \$$$$$$$ 
+    '''
     SRC_DIR = 'pom'
     DST_DIR = 'map'
     MAX_ZOOM = 7  # in the src_map
@@ -132,7 +143,9 @@ if __name__ == '__main__':
 
     # answer if is update needed?
     if DEBUG or (len(sys.argv) > 1 and sys.argv[1] == 'updated'):
+        from tqdm import tqdm
         config()
+        print(shahb_asci)
         shift()
     else:
         tt = threading.Thread(target=waiting)
