@@ -166,7 +166,7 @@ if __name__ == '__main__':
             \$$$$$$                                                                             
     '''
     SRC_DIR = 'pom'
-    DST_DIR = 'map'
+    DST_DIR = 'raheAbrishamMap'
     MAX_ZOOM = 7  # in the src_map
     load_dotenv()
     DEBUG = bool(os.getenv("DEBUG"))
