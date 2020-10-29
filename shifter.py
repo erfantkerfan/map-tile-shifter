@@ -7,6 +7,7 @@ import threading
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
+from threading import Thread
 
 from dotenv import load_dotenv
 from pick import pick
@@ -14,6 +15,7 @@ from pick import pick
 logging.basicConfig(level=logging.WARNING, filename='log.log', filemode='w', format='%(levelname)s - %(message)s')
 
 VERSION = '1.1.0'
+SIMULTANEOUS_THREADS = 100
 
 
 # get initialising values from user via console
@@ -37,6 +39,7 @@ def config():
 def shift():
     global zoom_shift, column_shift, row_shift
     errors = 0
+    threads = []
     for zoom in range(0, MAX_ZOOM + 1):
         bar = tqdm(total=2 ** zoom, desc='zoom ' + str(zoom), unit='pic')
         for column in range(0, 2 ** zoom):
@@ -53,13 +56,27 @@ def shift():
                         errors += 1
                     else:
                         try:
-                            shutil.move(src_path, dst_path)
+                            # throttle the conversion parallel processes
+                            while threading.activeCount() > SIMULTANEOUS_THREADS:
+                                pass
+                            threads = [t for t in threads if t.is_alive()]
+                            name = 't: ' + ' - '.join([str(zoom), str(column), str(row)])
+                            threads.append(Thread(name=name, target=move,
+                                                  args=(src_path, dst_path)))
+                            threads[-1].start()
                         except:
                             logging.error('moving encountered error' + src_path + ' to ' + dst_path)
                             errors += 1
             bar.update(1)
+            # stay here until all threads are finished
+            while any([t.is_alive for t in threads]):
+                threads = [t for t in threads if t.is_alive()]
         bar.close()
     logging.error('total errors: ' + str(errors))
+
+
+def move(src, dst):
+    shutil.move(src, dst)
 
 
 # update the code with github
@@ -123,7 +140,7 @@ def reload(updated=False):
 
 if __name__ == '__main__':
     # set up initial variables
-    shahb_asci = '''
+    asci_shahb_hi = '''
  __    __  __         ______   __                  __                  __       
 |  \  |  \|  \       /      \ |  \                |  \                |  \      
 | $$  | $$ \$$      |  $$$$$$\| $$____    ______  | $$____    ______  | $$____  
@@ -133,6 +150,20 @@ if __name__ == '__main__':
 | $$  | $$| $$      |  \__| $$| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$__/ $$
 | $$  | $$| $$       \$$    $$| $$  | $$ \$$    $$| $$  | $$ \$$    $$| $$    $$
  \$$   \$$ \$$        \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$  \$$$$$$$ \$$$$$$$ 
+    '''
+    asci_shahb_bye = '''
+ _______                              ______   __                  __                  __       
+|       \                            /      \ |  \                |  \                |  \      
+| $$$$$$$\ __    __   ______        |  $$$$$$\| $$____    ______  | $$____    ______  | $$____  
+| $$__/ $$|  \  |  \ /      \       | $$___\$$| $$    \  |      \ | $$    \  |      \ | $$    \ 
+| $$    $$| $$  | $$|  $$$$$$\       \$$    \ | $$$$$$$\  \$$$$$$\| $$$$$$$\  \$$$$$$\| $$$$$$$\\
+| $$$$$$$\| $$  | $$| $$    $$       _\$$$$$$\| $$  | $$ /      $$| $$  | $$ /      $$| $$  | $$
+| $$__/ $$| $$__/ $$| $$$$$$$$      |  \__| $$| $$  | $$|  $$$$$$$| $$  | $$|  $$$$$$$| $$__/ $$
+| $$    $$ \$$    $$ \$$     \       \$$    $$| $$  | $$ \$$    $$| $$  | $$ \$$    $$| $$    $$
+ \$$$$$$$  _\$$$$$$$  \$$$$$$$        \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$  \$$$$$$$ \$$$$$$$ 
+          |  \__| $$                                                                            
+           \$$    $$                                                                            
+            \$$$$$$                                                                             
     '''
     SRC_DIR = 'pom'
     DST_DIR = 'map'
@@ -145,9 +176,12 @@ if __name__ == '__main__':
     # answer if is update needed?
     if DEBUG or (len(sys.argv) > 1 and sys.argv[1] == 'updated'):
         from tqdm import tqdm
+
         config()
-        print(shahb_asci)
+        print(asci_shahb_hi)
         shift()
+        print(asci_shahb_bye)
+        input("Press any key to continue . . .")
     else:
         tt = threading.Thread(target=waiting)
         tt.start()
