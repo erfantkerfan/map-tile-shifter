@@ -59,6 +59,7 @@ def shift():
                             errors += 1
             bar.update(1)
         bar.close()
+    logging.error('total errors: ' + str(errors))
 
 
 # update the code with github
