@@ -6,12 +6,11 @@ import subprocess
 import sys
 import threading
 import time
-import tkinter as tk
-import tkinter.ttk as ttk
 from threading import Thread
 
 from dotenv import load_dotenv
 from pick import pick
+from tqdm import tqdm
 
 logging.basicConfig(level=logging.WARNING, filename='log.log', filemode='w', format='%(levelname)s - %(message)s')
 
@@ -83,6 +82,13 @@ def execute(src, dst):
         os.remove(dst + '.webp')
 
 
+def clear_cache():
+    os.system('php /home/alaa/alaatv/artisan alaaTv:abrishamMapVersion:generate')
+    os.system('php /home/alaa/alaatv/artisan config:clear')
+    os.system('php /home/alaa/alaatv/artisan config:cache')
+    os.system('sudo service php7.3-fpm restart')
+
+
 # update the code with github
 def update():
     command = 'git fetch --all'
@@ -144,6 +150,23 @@ def reload(updated=False):
 
 if __name__ == '__main__':
     # set up initial variables
+    PRODUCTION = platform.system() != 'Windows'
+    MAX_ZOOM = 7  # in the src_map
+    load_dotenv()
+    DEBUG = bool(os.getenv("DEBUG"))
+    GIT_REMOTE = 'production'
+    GIT_BRANCH = 'master'
+
+    if PRODUCTION:
+        SRC_DIR = '/alaa_media/cdn/upload/pom'
+        DST_DIR = '/alaa_media/cdn/upload/raheAbrishamMap'
+    else:
+        import tkinter as tk
+        import tkinter.ttk as ttk
+
+        SRC_DIR = 'pom'
+        DST_DIR = 'map'
+
     asci_shahb_hi = '''
  __    __  __         ______   __                  __                  __       
 |  \  |  \|  \       /      \ |  \                |  \                |  \      
@@ -155,7 +178,7 @@ if __name__ == '__main__':
 | $$  | $$| $$       \$$    $$| $$  | $$ \$$    $$| $$  | $$ \$$    $$| $$    $$
  \$$   \$$ \$$        \$$$$$$  \$$   \$$  \$$$$$$$ \$$   \$$  \$$$$$$$ \$$$$$$$ 
     '''
-    asci_shahb_bye = '''
+    asci_shahb_bye = - '''
  _______                              ______   __                  __                  __       
 |       \                            /      \ |  \                |  \                |  \      
 | $$$$$$$\ __    __   ______        |  $$$$$$\| $$____    ______  | $$____    ______  | $$____  
@@ -169,28 +192,14 @@ if __name__ == '__main__':
            \$$    $$                                                                            
             \$$$$$$                                                                             
     '''
-    PRODUCTION = platform.system() != 'Windows'
-    if PRODUCTION:
-        SRC_DIR = '/alaa_media/cdn/upload/pom'
-        DST_DIR = '/alaa_media/cdn/upload/raheAbrishamMap'
-    else:
-        SRC_DIR = 'pom'
-        DST_DIR = 'map'
-    MAX_ZOOM = 7  # in the src_map
-    load_dotenv()
-    DEBUG = bool(os.getenv("DEBUG"))
-    GIT_REMOTE = 'production'
-    GIT_BRANCH = 'master'
 
     # answer if is update needed?
-    if DEBUG or (len(sys.argv) > 1 and sys.argv[1] == 'updated'):
-        from tqdm import tqdm
-
+    if DEBUG or PRODUCTION or (len(sys.argv) > 1 and sys.argv[1] == 'updated'):
         config()
         print(asci_shahb_hi)
         shift()
         print(asci_shahb_bye)
-        input("Press any key to continue . . .")
+        input("Press ENTER key to exit . . .")
     else:
         tt = threading.Thread(target=waiting)
         tt.start()
