@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -61,11 +62,12 @@ def shift():
                                 pass
                             threads = [t for t in threads if t.is_alive()]
                             name = 't: ' + ' - '.join([str(zoom), str(column), str(row)])
-                            threads.append(Thread(name=name, target=move,
+                            threads.append(Thread(name=name, target=execute,
                                                   args=(src_path, dst_path)))
                             threads[-1].start()
                         except:
-                            logging.error('moving encountered error' + src_path + ' to ' + dst_path)
+                            logging.error(
+                                'moving and deleting webp-image encountered error' + src_path + ' to ' + dst_path)
                             errors += 1
             bar.update(1)
             # stay here until all threads are finished
@@ -75,8 +77,10 @@ def shift():
     logging.error('total errors: ' + str(errors))
 
 
-def move(src, dst):
+def execute(src, dst):
     shutil.move(src, dst)
+    if PRODUCTION:
+        os.remove(dst + '.webp')
 
 
 # update the code with github
@@ -165,8 +169,13 @@ if __name__ == '__main__':
            \$$    $$                                                                            
             \$$$$$$                                                                             
     '''
-    SRC_DIR = 'pom'
-    DST_DIR = 'raheAbrishamMap'
+    PRODUCTION = platform.system() != 'Windows'
+    if PRODUCTION:
+        SRC_DIR = '/alaa_media/cdn/upload/pom'
+        DST_DIR = '/alaa_media/cdn/upload/raheAbrishamMap'
+    else:
+        SRC_DIR = 'pom'
+        DST_DIR = 'map'
     MAX_ZOOM = 7  # in the src_map
     load_dotenv()
     DEBUG = bool(os.getenv("DEBUG"))
