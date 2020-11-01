@@ -14,8 +14,8 @@ from tqdm import tqdm
 
 logging.basicConfig(level=logging.WARNING, filename='log.log', filemode='w', format='%(levelname)s - %(message)s')
 
-VERSION = '1.1.0'
-SIMULTANEOUS_THREADS = 100
+VERSION = '1.1.1'
+SIMULTANEOUS_THREADS = 50
 
 
 # get initialising values from user via console
