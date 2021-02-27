@@ -199,6 +199,9 @@ if __name__ == '__main__':
         print(asci_shahb_hi)
         shift()
         print(asci_shahb_bye)
+        if platform.system() != 'Windows':
+            clear_cache()
+        print
         input("Press ENTER key to exit . . .")
     else:
         tt = threading.Thread(target=waiting)
