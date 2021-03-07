@@ -107,6 +107,7 @@ def update():
             command = 'pip install -r requirements.txt'
             process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, shell=True)
             status = process.wait()
+            status = process.wait()
             if status == 0:
                 update_text.set('✔ ✔ ✔')
                 reload(updated=True)
@@ -198,7 +199,7 @@ if __name__ == '__main__':
         print(asci_shahb_hi)
         shift()
         print(asci_shahb_bye)
-        if platform.system() != 'Windows':
+        if PRODUCTION:
             clear_cache()
         input("Press ENTER key to exit . . .")
     else:
