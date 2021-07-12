@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 logging.basicConfig(level=logging.WARNING, filename='log.log', filemode='w', format='%(levelname)s - %(message)s')
 
-VERSION = '1.1.1'
+VERSION = '1.2.0'
 SIMULTANEOUS_THREADS = 50
 
 
@@ -151,7 +151,7 @@ def reload(updated=False):
 if __name__ == '__main__':
     # set up initial variables
     PRODUCTION = platform.system() != 'Windows'
-    MAX_ZOOM = 7  # in the src_map
+    MAX_ZOOM = 8  # in the src_map
     load_dotenv()
     DEBUG = bool(os.getenv("DEBUG"))
     GIT_REMOTE = 'production'
