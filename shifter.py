@@ -85,7 +85,7 @@ def execute(src, dst):
 def clear_cache():
     os.system('php /home/alaa/alaatv/artisan alaaTv:abrishamMapVersion:generate')
     os.system('php /home/alaa/alaatv/artisan config:cache')
-    os.system('sudo service php7.3-fpm restart')
+    os.system('sudo service php7.4-fpm restart')
 
 
 # update the code with github
